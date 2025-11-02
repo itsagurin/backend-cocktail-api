@@ -23,10 +23,9 @@ steps:
     - '--region=${_REGION}'
     - '--platform=managed'
     - '--allow-unauthenticated'
-    - '--set-env-vars=DATABASE_HOST=${_DB_HOST},DATABASE_USER=${_DB_USER},DATABASE_NAME=${_DB_NAME}'
+    - '--set-env-vars=DATABASE_USER=${_DB_USER},DATABASE_NAME=${_DB_NAME}'
     - '--add-cloudsql-instances=${_DB_CONNECTION_NAME}'
     - '--set-secrets=DATABASE_PASSWORD=_DB_PASSWORD:latest'
-    
   id: Deploy
 
 substitutions:
@@ -35,6 +34,9 @@ substitutions:
   _DB_CONNECTION_NAME: 'cocktail-api-project:europe-central2:cocktail-db-instance'
   _DB_USER: 'postgres'
   _DB_NAME: 'cocktails_db'
-  
+
 images:
 - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
