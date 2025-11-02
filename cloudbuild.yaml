@@ -1,0 +1,38 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+    - '.'
+  id: Build
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+  id: Push
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'cocktail-api-service'
+    - '--image=${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+    - '--region=${_REGION}'
+    - '--platform=managed'
+    - '--allow-unauthenticated'
+    - '--set-env-vars=DATABASE_HOST=${_DB_HOST},DATABASE_USER=${_DB_USER},DATABASE_PASSWORD=${_DB_PASSWORD},DATABASE_NAME=${_DB_NAME}'
+    - '--add-cloudsql-instances=${_DB_CONNECTION_NAME}'
+  id: Deploy
+
+substitutions:
+  _PROJECT_ID: 'cocktail-api-project'
+  _REGION: 'europe-central2'
+  _DB_CONNECTION_NAME: 'cocktail-api-project:europe-central2:cocktail-db-instance'
+  _DB_USER: 'postgres'
+  _DB_NAME: 'cocktails_db'
+  
+images:
+- '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
