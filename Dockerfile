@@ -10,7 +10,7 @@ RUN npm i
 FROM base AS production-deps
 WORKDIR /app
 ADD package.json ./
-RUN npm i --omit=dev
+RUN npm i
 
 # Build stage
 FROM base AS build
