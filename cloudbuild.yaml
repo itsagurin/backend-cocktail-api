@@ -23,7 +23,7 @@ steps:
     - '--region=${_REGION}'
     - '--platform=managed'
     - '--allow-unauthenticated'
-    - '--set-env-vars=DATABASE_USER=${_DB_USER},DATABASE_NAME=${_DB_NAME}'
+    - '--set-env-vars=DATABASE_USER=${_DB_USER},DATABASE_NAME=${_DB_NAME},DATABASE_HOST=/cloudsql/${_DB_CONNECTION_NAME}'
     - '--add-cloudsql-instances=${_DB_CONNECTION_NAME}'
     - '--set-secrets=DATABASE_PASSWORD=_DB_PASSWORD:latest'
   id: Deploy
