@@ -1,14 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
-    - 'build'
-    - '-t'
-    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
-    - '.'
-  id: Build
-
-- name: 'gcr.io/cloud-builders/docker'
-  args:
     - 'push'
     - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
   id: Push
