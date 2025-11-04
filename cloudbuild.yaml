@@ -1,32 +1,42 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    id: Build
-    args:
-      - 'build'
-      - '-t'
-      - 'europe-central2-docker.pkg.dev/cocktail-api-project/cocktail-api-repo/backend-app'
-      - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+    - '.'
+  id: Build
 
-  - name: 'gcr.io/cloud-builders/docker'
-    id: Push
-    args:
-      - 'push'
-      - 'europe-central2-docker.pkg.dev/cocktail-api-project/cocktail-api-repo/backend-app'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+  id: Push
 
-  - name: 'gcr.io/google-cloud-sdk/gcloud'
-    id: Deploy
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'cocktail-api-service'
-      - '--image'
-      - 'europe-central2-docker.pkg.dev/cocktail-api-project/cocktail-api-repo/backend-app'
-      - '--region'
-      - 'europe-central2'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'cocktail-api-service'
+    - '--image=${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+    - '--region=${_REGION}'
+    - '--platform=managed'
+    - '--allow-unauthenticated'
+    - '--set-env-vars=DATABASE_USER=${_DB_USER},DATABASE_NAME=${_DB_NAME}'
+    - '--add-cloudsql-instances=${_DB_CONNECTION_NAME}'
+    - '--set-secrets=DATABASE_PASSWORD=_DB_PASSWORD:latest'
+  id: Deploy
+
+substitutions:
+  _PROJECT_ID: 'cocktail-api-project'
+  _REGION: 'europe-central2'
+  _DB_CONNECTION_NAME: 'cocktail-api-project:europe-central2:cocktail-db-instance'
+  _DB_USER: 'postgres'
+  _DB_NAME: 'cocktails_db'
 
 images:
-  - 'europe-central2-docker.pkg.dev/cocktail-api-project/cocktail-api-repo/backend-app'
+- '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/cocktail-api-repo/backend-app:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
